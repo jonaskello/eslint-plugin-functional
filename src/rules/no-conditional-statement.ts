@@ -1,8 +1,12 @@
 import { TSESTree } from "@typescript-eslint/experimental-utils";
 import { JSONSchema4 } from "json-schema";
+import { Type } from "typescript";
+
+import tsutils from "../util/conditional-imports/tsutils";
 
 import {
   createRule,
+  getTypeOfNode,
   RuleContext,
   RuleMetaData,
   RuleResult,
@@ -52,7 +56,7 @@ const errorMessages = {
   incompleteIf:
     "Incomplete if, it must have an else statement and every branch must contain a return statement.",
   incompleteSwitch:
-    "Incomplete switch, it must have an default case and every case must contain a return statement.",
+    "Incomplete switch, it must be exhaustive or have an default case and every case must contain a return statement.",
   unexpectedIf:
     "Unexpected if, use a conditional expression (ternary operator) instead.",
   unexpectedSwitch:
@@ -132,14 +136,46 @@ function isExhaustiveIfViolation(node: TSESTree.IfStatement): boolean {
 }
 
 /**
+ * Does the given typed switch statement violate this rule if it must be exhaustive.
+ */
+function isExhaustiveTypeSwitchViolation(
+  node: TSESTree.SwitchStatement,
+  context: RuleContext<keyof typeof errorMessages, Options>
+): boolean {
+  if (tsutils === undefined) {
+    return false;
+  } else {
+    const discriminantType = getTypeOfNode(node.discriminant, context);
+
+    if (discriminantType === null || !discriminantType.isUnion()) {
+      return false;
+    } else {
+      const unionTypes = tsutils.unionTypeParts(discriminantType);
+      const caseTypes = node.cases.reduce<ReadonlySet<Type>>(
+        (types, c) => new Set([...types, getTypeOfNode(c.test!, context)!]),
+        new Set()
+      );
+      return (
+        unionTypes.filter((unionType) => !caseTypes.has(unionType)).length !== 0
+      );
+    }
+  }
+}
+
+/**
  * Does the given switch statement violate this rule if it must be exhaustive.
  */
-function isExhaustiveSwitchViolation(node: TSESTree.SwitchStatement): boolean {
+function isExhaustiveSwitchViolation(
+  node: TSESTree.SwitchStatement,
+  context: RuleContext<keyof typeof errorMessages, Options>
+): boolean {
   return (
     // No cases defined.
     node.cases.length === 0 ||
-    // No default case defined.
-    node.cases.every((c) => c.test !== null)
+      // No default case defined.
+      node.cases.every((c) => c.test !== null)
+      ? true
+      : isExhaustiveTypeSwitchViolation(node, context)
   );
 }
 
@@ -175,7 +211,7 @@ function checkSwitchStatement(
     context,
     descriptors: options.allowReturningBranches
       ? options.allowReturningBranches === "ifExhaustive"
-        ? isExhaustiveSwitchViolation(node)
+        ? isExhaustiveSwitchViolation(node, context)
           ? [{ node, messageId: "incompleteSwitch" }]
           : getSwitchViolations(node)
         : getSwitchViolations(node)
