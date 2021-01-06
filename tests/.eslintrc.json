@@ -1,0 +1,12 @@
+{
+  "plugins": ["ava"],
+  "extends": ["plugin:ava/recommended"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars-experimental": "off",
+    "ava/no-import-test-files": ["error", { "files": ["tests/**/*.test.ts"] }],
+    "eslint-comments/disable-enable-pair": "off",
+    "eslint-comments/no-unlimited-disable": "off",
+    "functional/no-return-void": "off",
+    "import/no-named-as-default-member": "off"
+  }
+}

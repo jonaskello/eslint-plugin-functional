@@ -4,20 +4,14 @@
  */
 
 import dedent from "dedent";
-import {
-  ValidTestCase,
-  InvalidTestCase,
-  processValidTestCase,
-  processInvalidTestCase,
-} from "../helpers/util";
-import { typescript } from "../helpers/configs";
-import { RuleTester } from "eslint";
+import type { ValidTestCase, InvalidTestCase } from "~/tests/helpers/util";
+import { testUsing } from "~/tests/helpers/testers";
 
 /*
  * Step 1.
  * Import the rule to test.
  */
-import { rule } from "../../src/rules/prefer-readonly-type";
+import { name, rule } from "~/rules/prefer-readonly-type";
 
 /*
  * Step 2a.
@@ -61,8 +55,7 @@ const invalid: ReadonlyArray<InvalidTestCase> = [
  * Run test with `yarn test-work` or to debug in vscode, press F5 (with this
  * file open and focused).
  */
-const ruleTester = new RuleTester(typescript);
-ruleTester.run("Work", rule, {
-  valid: processValidTestCase(valid),
-  invalid: processInvalidTestCase(invalid),
+testUsing.typescript(name, rule, {
+  valid: valid,
+  invalid: invalid,
 });

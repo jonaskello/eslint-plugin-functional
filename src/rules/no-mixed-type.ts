@@ -1,16 +1,10 @@
-import {
-  AST_NODE_TYPES,
-  TSESTree,
-} from "@typescript-eslint/experimental-utils";
-import { JSONSchema4 } from "json-schema";
+import type { TSESTree } from "@typescript-eslint/experimental-utils";
+import { AST_NODE_TYPES } from "@typescript-eslint/experimental-utils";
+import type { JSONSchema4 } from "json-schema";
 
-import {
-  createRule,
-  RuleContext,
-  RuleMetaData,
-  RuleResult,
-} from "../util/rule";
-import { isTSPropertySignature, isTSTypeLiteral } from "../util/typeguard";
+import type { RuleContext, RuleMetaData, RuleResult } from "~/utils/rule";
+import { createRule } from "~/utils/rule";
+import { isTSPropertySignature, isTSTypeLiteral } from "~/utils/typeguard";
 
 // The name of this rule.
 export const name = "no-mixed-type" as const;
@@ -55,7 +49,7 @@ const meta: RuleMetaData<keyof typeof errorMessages> = {
     description:
       "Restrict types so that only members of the same kind of are allowed in them.",
     category: "Best Practices",
-    recommended: false,
+    recommended: "error",
   },
   messages: errorMessages,
   schema,

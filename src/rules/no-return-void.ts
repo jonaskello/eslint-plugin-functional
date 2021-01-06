@@ -1,17 +1,13 @@
-import { TSESTree } from "@typescript-eslint/experimental-utils";
-import { JSONSchema4 } from "json-schema";
+import type { TSESTree } from "@typescript-eslint/experimental-utils";
+import type { JSONSchema4 } from "json-schema";
 
-import {
-  createRule,
-  RuleContext,
-  RuleMetaData,
-  RuleResult,
-} from "../util/rule";
+import type { RuleContext, RuleMetaData, RuleResult } from "~/utils/rule";
+import { createRule } from "~/utils/rule";
 import {
   isTSNullKeyword,
   isTSUndefinedKeyword,
   isTSVoidKeyword,
-} from "../util/typeguard";
+} from "~/utils/typeguard";
 
 // The name of this rule.
 export const name = "no-return-void" as const;
@@ -55,7 +51,7 @@ const meta: RuleMetaData<keyof typeof errorMessages> = {
   docs: {
     description: "Disallow functions that don't return anything.",
     category: "Best Practices",
-    recommended: false,
+    recommended: "error",
   },
   messages: errorMessages,
   schema,

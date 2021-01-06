@@ -1,12 +1,8 @@
-import { TSESTree } from "@typescript-eslint/experimental-utils";
-import { JSONSchema4 } from "json-schema";
+import type { TSESTree } from "@typescript-eslint/experimental-utils";
+import type { JSONSchema4 } from "json-schema";
 
-import {
-  createRule,
-  RuleContext,
-  RuleMetaData,
-  RuleResult,
-} from "../util/rule";
+import type { RuleContext, RuleMetaData, RuleResult } from "~/utils/rule";
+import { createRule } from "~/utils/rule";
 
 // The name of this rule.
 export const name = "no-method-signature" as const;
@@ -33,7 +29,7 @@ const meta: RuleMetaData<keyof typeof errorMessages> = {
     description:
       "Prefer property signatures with readonly modifiers over method signatures.",
     category: "Best Practices",
-    recommended: "error",
+    recommended: "warn",
   },
   messages: errorMessages,
   schema,
