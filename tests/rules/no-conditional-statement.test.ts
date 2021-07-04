@@ -54,23 +54,6 @@ const valid: ReadonlyArray<ValidTestCase> = [
       }`,
     optionsSet: [[{ allowReturningBranches: true }]],
   },
-  {
-    code: dedent`
-      function foo(i) {
-        switch(i) {
-          case "a":
-            return 1;
-          case "b":
-            return 2;
-          default:
-            return 3;
-        }
-      }`,
-    optionsSet: [
-      [{ allowReturningBranches: true }],
-      [{ allowReturningBranches: "ifExhaustive" }],
-    ],
-  },
 ];
 
 // Invalid test cases.
@@ -304,25 +287,27 @@ const invalid: ReadonlyArray<InvalidTestCase> = [
   },
 ];
 
-// Exhaustive type test. - Not currently supported.
-// {
-//   code: dedent`
-//     type T = "a" | "b";
-//     function foo(i: T) {
-//       switch(i) {
-//         case "a":
-//           return 1;
-//         case "b":
-//           return 2;
-//       }
-//     }`,
-//   optionsSet: [[{ allowReturningBranches: "ifExhaustive" }]]
-// }
+// Exhaustive type test.
+const typedValid: ReadonlyArray<ValidTestCase> = [
+  {
+    code: dedent`
+      type T = "a" | "b";
+      function foo(i: T) {
+        switch(i) {
+          case "a":
+            return 1;
+          case "b":
+            return 2;
+        }
+      }`,
+    optionsSet: [[{ allowReturningBranches: "ifExhaustive" }]],
+  },
+];
 
 describeTsOnly("TypeScript", () => {
   const ruleTester = new RuleTester(typescript);
   ruleTester.run(name, rule, {
-    valid: processValidTestCase(valid),
+    valid: processValidTestCase([...valid, ...typedValid]),
     invalid: processInvalidTestCase(invalid),
   });
 });
